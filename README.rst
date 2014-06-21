@@ -9,15 +9,25 @@ Features
 ---------
 
 * For Django 1.6
-* Twitter Bootstrap 3
-* AngularJS
-* Settings management via django-configurations
-* Registration via django-allauth
-* User avatars via django-avatar
-* Procfile for deploying to Heroku
+* Twitter Bootstrap_ 3
+* AngularJS_
+* Settings management via django-configurations_
+* Registration via django-allauth_
+* User avatars via django-avatar_
+* Procfile_ for deploying to Heroku
 * Heroku optimized requirements
 * Basic caching setup
 * Grunt build for compass and livereload
+* Basic e-mail configurations for send emails via SendGrid_
+
+.. _Bootstrap: https://github.com/twbs/bootstrap
+.. _AngularJS: https://github.com/angular/angular.js
+.. _django-configurations: https://github.com/jezdez/django-configurations
+.. _django-allauth: https://github.com/pennersr/django-allauth
+.. _django-avatar: https://github.com/jezdez/django-avatar/
+.. _Procfile: https://devcenter.heroku.com/articles/procfile
+.. _SendGrid: https://sendgrid.com/
+
 
 Constraints
 -----------
@@ -54,7 +64,7 @@ It prompts you for questions. Answer them::
     remote: Total 550 (delta 283), reused 479 (delta 222)
     Receiving objects: 100% (550/550), 127.66 KiB | 58 KiB/s, done.
     Resolving deltas: 100% (283/283), done.
-    project_name (default is "project_name")? redditclone
+    project_name (default is "project_name")? Reddit Clone
     repo_name (default is "repo_name")? redditclone
     author_name (default is "Your Name")? Daniel Greenfeld
     email (default is "Your email")? pydanny@gmail.com
@@ -78,8 +88,50 @@ Create a GitHub repo and push it there::
 
 Now take a look at your repo. Don't forget to carefully look at the generated README. Awesome, right?
 
-It's time to write the code!!!
+Getting up and running
+----------------------
 
+The steps below will get you up and running with a local development environment. We assume you have the following installed:
+
+* pip
+* virtualenv
+* PostgreSQL
+
+First make sure to create and activate a virtualenv_, then open a terminal at the project root and install the requirements for local development::
+
+    $ pip install -r requirements/local.txt
+
+.. _virtualenv: http://docs.python-guide.org/en/latest/dev/virtualenvs/
+
+You can now run the usual Django ``runserver`` command (replace ``yourapp`` with the name of the directory containing the Django project)::
+
+    $ python yourapp/manage.py runserver
+
+The base app will run but you'll need to carry out a few steps to make the sign-up and login forms work. These are currently detailed in `issue #39`_.
+
+.. _issue #39: https://github.com/pydanny/cookiecutter-django/issues/39
+
+**Live reloading and Sass CSS compilation**
+
+If you'd like to take advantage of live reloading and Sass / Compass CSS compilation you can do so with the included Grunt task.
+
+Make sure that nodejs_ is installed. Then in the project root run::
+
+    $ npm install
+
+.. _nodejs: http://nodejs.org/download/
+
+Now you just need::
+
+    $ grunt serve
+
+The base app will now run as it would with the usual ``manage.py runserver`` but with live reloading and Sass compilation enabled.
+
+To get live reloading to work you'll probably need to install an `appropriate browser extension`_
+
+.. _appropriate browser extension: http://feedback.livereload.com/knowledgebase/articles/86242-how-do-i-install-and-use-the-browser-extensions-
+
+It's time to write the code!!!
 
 "Your Stuff"
 -------------

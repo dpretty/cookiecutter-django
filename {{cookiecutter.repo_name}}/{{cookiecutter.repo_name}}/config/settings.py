@@ -81,7 +81,7 @@ class Common(Configuration):
 
     ########## DEBUG
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
-    DEBUG = values.BooleanValue(True)
+    DEBUG = values.BooleanValue(False)
 
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
     TEMPLATE_DEBUG = DEBUG
@@ -100,7 +100,7 @@ class Common(Configuration):
         join(BASE_DIR, 'fixtures'),
     )
     ########## END FIXTURE CONFIGURATION
-    
+
     ########## EMAIL CONFIGURATION
     EMAIL_BACKEND = values.Value('django.core.mail.backends.smtp.EmailBackend')
     ########## END EMAIL CONFIGURATION
@@ -275,6 +275,11 @@ class Common(Configuration):
 
 class Local(Common):
 
+    ########## DEBUG
+    DEBUG = values.BooleanValue(True)
+    TEMPLATE_DEBUG = DEBUG
+    ########## END DEBUG
+
     ########## INSTALLED_APPS
     INSTALLED_APPS = Common.INSTALLED_APPS
     ########## END INSTALLED_APPS
@@ -292,7 +297,9 @@ class Local(Common):
     INTERNAL_IPS = ('127.0.0.1',)
 
     DEBUG_TOOLBAR_CONFIG = {
-        'INTERCEPT_REDIRECTS': False,
+        'DISABLE_PANELS': [
+            'debug_toolbar.panels.redirects.RedirectsPanel',
+        ],
         'SHOW_TEMPLATE_CONTEXT': True,
     }
     ########## end django-debug-toolbar
@@ -326,7 +333,7 @@ class Production(Common):
 
     ########## SITE CONFIGURATION
     # Hosts/domain names that are valid for this site
-    # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
+    # See https://docs.djangoproject.com/en/1.6/ref/settings/#allowed-hosts
     ALLOWED_HOSTS = ["*"]
     ########## END SITE CONFIGURATION
 
@@ -348,6 +355,10 @@ class Production(Common):
     AWS_AUTO_CREATE_BUCKET = True
     AWS_QUERYSTRING_AUTH = False
 
+    # see: https://github.com/antonagestam/collectfast
+    AWS_PRELOAD_METADATA = True
+    INSTALLED_APPS += ("collectfast", )
+
     # AWS cache settings, don't change unless you know what you're doing:
     AWS_EXPIREY = 60 * 60 * 24 * 7
     AWS_HEADERS = {
@@ -361,7 +372,7 @@ class Production(Common):
 
     ########## EMAIL
     DEFAULT_FROM_EMAIL = values.Value(
-            '{{cookiecutter.project_name}} <{{cookiecutter.project_name}}-noreply@{{cookiecutter.domain_name}}>')
+            '{{cookiecutter.project_name}} <noreply@{{cookiecutter.domain_name}}>')
     EMAIL_HOST = values.Value('smtp.sendgrid.com')
     EMAIL_HOST_PASSWORD = values.SecretValue(environ_prefix="", environ_name="SENDGRID_PASSWORD")
     EMAIL_HOST_USER = values.SecretValue(environ_prefix="", environ_name="SENDGRID_USERNAME")
@@ -384,7 +395,12 @@ class Production(Common):
 
     ########## CACHING
     # Only do this here because thanks to django-pylibmc-sasl and pylibmc memcacheify is painful to install on windows.
-    CACHES = values.CacheURLValue(default="memcached://127.0.0.1:11211")
+    try:
+        # See: https://github.com/rdegges/django-heroku-memcacheify
+        from memcacheify import memcacheify
+        CACHES = memcacheify()
+    except ImportError:
+        CACHES = values.CacheURLValue(default="memcached://127.0.0.1:11211")
     ########## END CACHING
 
     ########## Your production stuff: Below this line define 3rd party libary settings
